@@ -16,17 +16,24 @@ class Transaction extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
-        'transact_date',
-        'transact_desc',
-        'transact_type',
-        'transact_amount',
-        'transact_reference',
-        'transact_status'
+        'account_id',
+        'date_time',
+        'sender_name',
+        'sender_acct',
+        'receiver_name',
+        'receiver_acct',
+        'description',
+        'type',
+        'currency',
+        'amount',
+        'opening_balance',
+        'closing_balance',
+        'reference',
+        'status'
     ];
 
-    public function customer(): BelongsTo
+    public function accounts(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Account::class);
     }
 }

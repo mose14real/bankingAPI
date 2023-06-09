@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreTransactionRequest extends FormRequest
+class TransferRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +24,9 @@ class StoreTransactionRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'max:255', 'unique:users']
+            'sender_acctNumber' => ['required', 'string', 'min:10', 'max:10'],
+            'receiver_acctNumber' => ['required', 'string', 'min:10', 'max:10'],
+            'amount' => ['required', 'numeric', 'decimal:2']
         ];
     }
 }

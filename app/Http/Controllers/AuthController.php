@@ -13,9 +13,9 @@ class AuthController extends Controller
 
     public function login(LoginUserRequest $request)
     {
-        $request->validated($request->only(['email', 'password']));
+        $request->validated();
 
-        if (!Auth::attempt($request->only(['email', 'password']))) {
+        if (!Auth::attempt($request->validated())) {
             return $this->error('', 'Credentials do not match', 401);
         }
 

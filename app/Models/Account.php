@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -16,12 +17,12 @@ class Account extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
-        'acct_no',
-        'acct_type',
-        'acct_status',
+        'customer_id',
+        'acct_number',
+        'type',
+        'status',
         'currency',
-        'balance',
+        'available_balance',
         'pin',
         'officer_name',
         'officer_email',
@@ -31,5 +32,10 @@ class Account extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
     }
 }

@@ -15,13 +15,20 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('transact_date');
-            $table->string('transact_desc');
-            $table->enum('transact_type', ['debit', 'credit']);
-            $table->double('transact_amount', 8, 2);
-            $table->string('transact_reference');
-            $table->enum('transact_status', ['successful', 'pending', 'failed']);
+            $table->foreignId('account_id')->constrained('accounts')->cascadeOnDelete();
+            $table->string('date_time');
+            $table->string('sender_name')->nullable();
+            $table->string('sender_acct')->nullable();
+            $table->string('receiver_name')->nullable();
+            $table->string('receiver_acct')->nullable();
+            $table->string('description');
+            $table->enum('type', ['debit', 'credit']);
+            $table->enum('currency', ['NGN', 'USD', 'GBP', 'EUR']);
+            $table->double('amount', 17, 2);
+            $table->double('opening_balance', 17, 2);
+            $table->double('closing_balance', 17, 2);
+            $table->string('reference');
+            $table->enum('status', ['successful', 'pending', 'failed']);
             $table->timestamps();
         });
     }
