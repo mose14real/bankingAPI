@@ -106,7 +106,7 @@ class CustomersController extends Controller
     public function transferHistory(AcctNumberRequest $request)
     {
         $acct = Account::where('acct_number', $request['acctNumber'])->first();
-        $transaction = Transaction::where('customer_id', $acct->customer_id)->get();
+        $transaction = Transaction::where('account_id', $acct->id)->get();
         return $transaction;
     }
 }

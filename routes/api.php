@@ -35,7 +35,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::prefix('customer')->group(function () {
                 Route::patch('transfer-fund', 'transferFund');
                 Route::post('check-balance', 'retrieveBalance');
-                Route::get('check-all-acct/{id}', 'retrieveAllAcct');
+                // Route::get('check-all-acct/{id}', 'retrieveAllAcct');
                 Route::post('check-transfer-history', 'transferHistory');
             });
         });

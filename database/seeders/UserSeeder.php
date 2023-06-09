@@ -20,6 +20,7 @@ class UserSeeder extends Seeder
         User::insert(
             [
                 [
+                    'uuid' => Str::orderedUuid(),
                     'name' => "Oluwasegun Moses Olopade",
                     'email' => "oluwasegun.olopade@disreybankplc.com",
                     'phone' => '08101560019',
@@ -31,6 +32,7 @@ class UserSeeder extends Seeder
                 ],
 
                 [
+                    'uuid' => Str::orderedUuid(),
                     'name' => "Unwana Bright Ekpo",
                     'email' => "unwana.ekpo@disreybankplc.com",
                     'phone' => '08147512594',
@@ -42,6 +44,7 @@ class UserSeeder extends Seeder
                 ],
 
                 [
+                    'uuid' => Str::orderedUuid(),
                     'name' => "Oluwastunmise Abigail Obafunmilayo",
                     'email' => "tunmise.obafunmilayo@disreybankplc.com",
                     'phone' => '08165220993',
@@ -53,6 +56,7 @@ class UserSeeder extends Seeder
                 ],
 
                 [
+                    'uuid' => Str::orderedUuid(),
                     'name' => "Thandiwe Abigail Sakala",
                     'email' => "thandiwe.sakala@disreybankplc.com",
                     'phone' => '08178341622',

@@ -17,6 +17,7 @@ class Customer extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'uuid',
         'user_id',
         'bvn',
         'employment',
@@ -34,5 +35,10 @@ class Customer extends Model
     public function accounts(): HasMany
     {
         return $this->hasMany(Account::class);
+    }
+
+    public static function findByUuid(string $uuid)
+    {
+        return self::where('uuid', $uuid)->first();
     }
 }

@@ -32,6 +32,7 @@ class AcctOfficersController extends Controller
 
             #--Create--User--
             $user = User::create([
+                'uuid' => Str::orderedUuid(),
                 'name' => $request['name'],
                 'email' => $request['email'],
                 'phone' => $request['phone'],
@@ -42,6 +43,7 @@ class AcctOfficersController extends Controller
 
             #--Create--Customer--
             $customer = Customer::create([
+                'uuid' => Str::orderedUuid(),
                 'user_id' => $user->id,
                 'bvn' => $request['bvn'],
                 'employment' => $request['employment'],
@@ -53,6 +55,7 @@ class AcctOfficersController extends Controller
 
             #--Create--Account--
             $account = Account::create([
+                'uuid' => Str::orderedUuid(),
                 'customer_id' => $customer->id,
                 'acct_number' => mt_rand(2023060000, 2023069999),
                 'type' => $request['type'],
@@ -67,6 +70,7 @@ class AcctOfficersController extends Controller
 
             #--Create--Transaction--
             $transaction = Transaction::create([
+                'uuid' => Str::orderedUuid(),
                 'account_id' => $account->id,
                 'date_time' => Carbon::now(),
                 'description' =>  "Initial cash deposit by " . Auth::user()->name,
@@ -79,20 +83,20 @@ class AcctOfficersController extends Controller
                 'transact_status' => 'successful'
             ]);
 
-            // return $this->success([
-            //     'message' => 'User/Customer/Account/Transaction created successfully'
-            // ]);
+            return $this->success([
+                'message' => 'User/Customer/Account/Transaction created successfully'
+            ]);
 
             // return UserResource::collection(
             //     User::where('id', Auth::user()->id)->get()
             // );
 
-            // return $this->success([
-            //     'user' => $user,
-            //     'customer' => $customer,
-            //     'account' => $transaction,
-            //     'transaction' => $account,
-            // ]);
+            return $this->success([
+                'user' => $user,
+                'customer' => $user->customer,
+                'account' => $customer->accounts,
+                'transaction' => $account->transaction,
+            ]);
         }, 1);
     }
 

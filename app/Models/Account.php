@@ -17,6 +17,7 @@ class Account extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'uuid',
         'customer_id',
         'acct_number',
         'type',
@@ -37,5 +38,10 @@ class Account extends Model
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public static function findByUuid(string $uuid)
+    {
+        return self::where('uuid', $uuid)->first();
     }
 }

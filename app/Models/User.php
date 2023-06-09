@@ -18,6 +18,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'uuid',
         'name',
         'email',
         'phone',
@@ -39,5 +40,10 @@ class User extends Authenticatable
     public function customer(): HasOne
     {
         return $this->hasOne(Customer::class);
+    }
+
+    public static function findByUuid(string $uuid)
+    {
+        return self::where('uuid', $uuid)->first();
     }
 }

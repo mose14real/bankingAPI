@@ -16,6 +16,7 @@ class Transaction extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'uuid',
         'account_id',
         'date_time',
         'sender_name',
@@ -35,5 +36,10 @@ class Transaction extends Model
     public function accounts(): BelongsTo
     {
         return $this->belongsTo(Account::class);
+    }
+
+    public static function findByUuid(string $uuid)
+    {
+        return self::where('uuid', $uuid)->first();
     }
 }

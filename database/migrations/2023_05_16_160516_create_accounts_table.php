@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid');
             $table->foreignId('customer_id')->constrained('customers')->cascadeOnDelete();
             $table->string('acct_number')->unique();
             $table->enum('type', ['savings', 'current', 'domiciliary']);
