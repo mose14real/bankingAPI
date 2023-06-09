@@ -17,6 +17,7 @@ class AccountResource extends JsonResource
         return [
             'Account Info' => [
                 'ID' => $this->id,
+                'UUID' => $this->uuid,
                 'Customer ID' => $this->customer_id,
                 'Number' => $this->acct_number,
                 'Type' => $this->type,

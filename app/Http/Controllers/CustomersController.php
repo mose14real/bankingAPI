@@ -20,29 +20,48 @@ class CustomersController extends Controller
 
     public function transferFund(TransferRequest $request)
     {
+        #Database Transaction
         DB::transaction(function () use ($request) {
 
+            #Authenticated User ID
+            $userId = Auth::user();
+
+            #Sender Account Number
             $senderAcct = Account::where('acct_number', $request['sender_acctNumber'])->first();
+
+            #Validate Authenticated User
+            if ($userId != $senderAcct->customer->user_id) {
+                return $this->error('', 'Unauthorized', 401);
+            }
+
+            #Validate Sender Account Number
             if (!$senderAcct) {
                 return $this->error('', 'Invalid sender account number', 404);
             }
 
+            #Receiver Account Number
             $receiverAcct = Account::where('acct_number', $request['receiver_acctNumber'])->first();
+
+            #Validate Receiver Account Number
             if (!$receiverAcct) {
                 return $this->error('', 'Invalid receiver account number', 404);
             }
 
+            #Sender Available Balance
             $senderOpeningBal = $senderAcct->available_balance;
+
+            #Transfer Amount
             $transferAmount = $request['amount'];
 
+            #Validate Sender Transaction
             if ($transferAmount > $senderOpeningBal) {
-                return $this->error('', 'Insufficient fund', 404);
+                return $this->error('', 'Insufficient fund', 424);
             }
 
             #Debit Process
             $senderClosingBal = $senderOpeningBal - $transferAmount;
 
-            #Sender Transaction
+            #Sender Debit Transaction
             Transaction::create([
                 'customer_id' => $senderAcct->customer_id,
                 'date_time' => Carbon::now(),
@@ -58,14 +77,16 @@ class CustomersController extends Controller
                 'transact_status' => 'successful'
             ]);
 
-            #Sender New Balance
+            #Update Sender Availabe Balance
             $senderAcct->update(['available_balance' => $senderClosingBal]);
 
-            #Credit Process
+            #Receiver Available Balance
             $receiverOpeningBal = $receiverAcct->available_balance;
+
+            #Credit Process
             $receiverClosingBal = $receiverOpeningBal + $transferAmount;
 
-            #Receiver Transaction
+            #Receiver Credit Transaction
             Transaction::create([
                 'customer_id' => $receiverAcct->customer_id,
                 'date_time' => Carbon::now(),
@@ -81,32 +102,66 @@ class CustomersController extends Controller
                 'transact_status' => 'successful'
             ]);
 
-            #Receiver New Balance
+            #Update Receiver Available Balance
             $receiverAcct->update(['available_balance' => $receiverClosingBal]);
-
-            return $this->success([
-                'message' => 'Transaction successful'
-            ]);
         }, 1);
+
+        return $this->success([
+            'message' => 'Transaction successful'
+        ]);
     }
 
     public function retrieveBalance(AcctNumberRequest $request)
     {
+        #Authenticated User ID
+        $userId = Auth::user()->id;
+
+        #Account Number
         $acct = Account::where('acct_number', $request['acctNumber'])->first();
+
+        #Validate Authenticated User
+        if ($userId != $acct->customer->user_id) {
+            return $this->error('', 'Unauthorized', 401);
+        }
+
+        #Validate Account Number
+        if (!$acct) {
+            return $this->error('', 'Invalid account number', 404);
+        }
+
+        #Account Resource
         return new AccountResource($acct);
     }
 
-    public function retrieveAllAcct($id)
-    {
-        $user = Account::where('account_id', $id->customer->id);
+    // public function retrieveAllAcct($id)
+    // {
+    //     $user = Account::where('account_id', $id->customer->id);
 
-        dd($user);
-    }
+    //     dd($user);
+    // }
 
     public function transferHistory(AcctNumberRequest $request)
     {
+        #Authenticated User ID
+        $userId = Auth::user()->id;
+
+        #Account Number
         $acct = Account::where('acct_number', $request['acctNumber'])->first();
+
+        #Validate Authenticated User
+        if ($userId != $acct->customer->user_id) {
+            return $this->error('', 'Unauthorized', 401);
+        }
+
+        #Validate Account Number
+        if (!$acct) {
+            return $this->error('', 'Invalid account number', 404);
+        }
+
+        #Procees Transaction
         $transaction = Transaction::where('account_id', $acct->id)->get();
+
+        #Transaction Resource
         return $transaction;
     }
 }

@@ -62,7 +62,7 @@ class AcctOfficersController extends Controller
                 'status' => 'active',
                 'currency' => $request['currency'],
                 'available_balance' => $request['amount'],
-                'pin' => mt_rand(0000, 9999),
+                'pin' => mt_rand(1000, 9999),
                 'officer_name' => Auth::user()->name,
                 'officer_email' => Auth::user()->email,
                 'officer_phone' => Auth::user()->phone,
@@ -82,31 +82,25 @@ class AcctOfficersController extends Controller
                 'reference' => Str::random(10),
                 'transact_status' => 'successful'
             ]);
-
-            return $this->success([
-                'message' => 'User/Customer/Account/Transaction created successfully'
-            ]);
-
-            // return UserResource::collection(
-            //     User::where('id', Auth::user()->id)->get()
-            // );
-
-            return $this->success([
-                'user' => $user,
-                'customer' => $user->customer,
-                'account' => $customer->accounts,
-                'transaction' => $account->transaction,
-            ]);
         }, 1);
+
+        return $this->success([
+            'message' => 'User/Customer/Account/Transaction created successfully'
+        ]);
     }
 
     public function OpenNewAcct(OpenNewAcctRequest $request)
     {
+        #Database Transaction
         DB::transaction(function () use ($request) {
 
-            $user = User::where('email', $request['email'])->first();
+            #Open Account for existing Customer
 
-            if (!$user) {
+            #User Email
+            $userEmail = User::where('email', $request['email'])->first();
+
+            #Validate User Email
+            if (!$userEmail) {
                 return $this->error('', 'User/Customer do not exist...', 404);
             }
 
@@ -118,7 +112,7 @@ class AcctOfficersController extends Controller
                 'status' => 'active',
                 'currency' => $request['currency'],
                 'available_balance' => $request['amount'],
-                'pin' => mt_rand(0001, 9999),
+                'pin' => mt_rand(1000, 9999),
                 'officer_name' => Auth::user()->name,
                 'officer_email' => Auth::user()->email,
                 'officer_phone' => Auth::user()->phone,
@@ -137,20 +131,16 @@ class AcctOfficersController extends Controller
                 'reference' => Str::random(10),
                 'transact_status' => 'successful'
             ]);
-
-            return $this->success([
-                'message' => 'Account created successfully...'
-            ]);
-
-            // return $this->success([
-            //     'account' => $transaction,
-            //     'transaction' => $account,
-            // ]);
         }, 1);
+
+        return $this->success([
+            'message' => 'Account created successfully...'
+        ]);
     }
 
     public function checkAccts()
     {
+        #Account Resource for all Customers
         return AccountResource::collection(
             Account::all()
         );
@@ -158,29 +148,41 @@ class AcctOfficersController extends Controller
 
     public function checkAcct(AcctNumberRequest $request)
     {
+        #Customer Account Number
         $acctNumber = Account::where('acct_number', $request['acctNumber'])->first();
 
+        #Validate Customer Account Number
         if (!$acctNumber) {
             return $this->error('', 'Invalid account number', 404);
         }
 
+        #Account Resource for a Customer
         return new AccountResource($acctNumber);
     }
 
     public function counterDeposit(CreditDebitRequest $request)
     {
+        #Database Transaction
         DB::transaction(function () use ($request) {
 
+            #Customer Account Number
             $acct = Account::where('acct_number', $request['acctNumber'])->first();
 
+            #validate Customer Account
             if (!$acct) {
                 return $this->error('', 'Invalid account number', 404);
             }
 
+            #Deposit Amount
             $amount = $request['amount'];
+
+            #Customer Avaiable Balance
             $openingBal = $acct->available_balance;
+
+            #Customer Credit Process
             $closingBal = $openingBal + $amount;
 
+            #Customer Credit Transaction
             Transaction::create([
                 'customer_id' => $acct->customer_id,
                 'date_time' => Carbon::now(),
@@ -194,29 +196,39 @@ class AcctOfficersController extends Controller
                 'transact_status' => 'successful'
             ]);
 
+            #Update Customer Available Balance
             $acct->update(['available_balance' => $closingBal]);
         }, 1);
     }
 
     public function counterWithdrawal(CreditDebitRequest $request)
     {
+        #Database Transaction
         DB::transaction(function () use ($request) {
 
+            #Customer Account Number
             $acct = Account::where('acct_number', $request['acctNumber'])->first();
 
+            #Validate Customer Account Number
             if (!$acct) {
                 return $this->error('', 'Invalid account number', 404);
             }
 
+            #Withdrawal Amount
             $amount = $request['amount'];
+
+            #Customer Available Balance
             $openingBal = $acct->available_balance;
 
+            #Validate Customer Transaction
             if ($amount > $openingBal) {
-                return $this->error('', 'Insufficient fund', 404);
+                return $this->error('', 'Insufficient fund', 424);
             }
 
+            #Customer Debit Process
             $closingBal = $openingBal - $amount;
 
+            #Customer Debit Transaction
             Transaction::create([
                 'customer_id' => $acct->customer_id,
                 'date_time' => Carbon::now(),
@@ -230,17 +242,21 @@ class AcctOfficersController extends Controller
                 'transact_status' => 'successful'
             ]);
 
+            #Update Customer Available Balance
             $acct->update(['available_balance' => $closingBal]);
-
-            return $this->success([
-                'message' => 'Transaction successful'
-            ]);
         }, 1);
+
+        return $this->success([
+            'message' => 'Transaction successful'
+        ]);
     }
 
     public function closeAcct(CloseAcctRequest $request)
     {
+        #Customer Email
         $user = User::where('email', $request['email']);
+
+        #Delete User/Customer/Accounts/Transactions
         $user->delete();
 
         return $this->success([

@@ -17,6 +17,7 @@ class TransactionResource extends JsonResource
         return [
             'Transaction Info' => [
                 'ID' => $this->id,
+                'UUID' => $this->uuid,
                 'Account ID' => $this->account_id,
                 'Date&Time' => $this->date_time,
                 'Sender Name' => $this->sender_name,
