@@ -37,7 +37,7 @@ class CreateAllRequest extends FormRequest
             'nationality' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'lowercase', 'max:11'],
             'currency' => ['required', 'string', 'uppercase', 'max:3'],
-            'amount' => ['required', 'numeric', 'decimal:2']
+            'amount' => ['required', 'numeric', 'decimal:2', 'min:0.00']
         ];
     }
 }
