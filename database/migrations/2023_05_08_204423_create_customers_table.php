@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('address');
             $table->string('nationality');
             $table->timestamps();
+            $table->softDeletesTz($column = 'deleted_at', $precision = 0);
         });
     }
 

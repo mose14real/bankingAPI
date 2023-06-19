@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('officer_email');
             $table->string('officer_phone');
             $table->timestamps();
+            $table->softDeletesTz($column = 'deleted_at', $precision = 0);
         });
     }
 

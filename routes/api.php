@@ -25,6 +25,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::patch('credit-acct', 'counterDeposit');
                 Route::patch('debit-acct', 'counterWithdrawal');
                 Route::post('close-acct', 'closeAcct');
+                Route::post('close-all', 'closeAll');
             });
         });
     });

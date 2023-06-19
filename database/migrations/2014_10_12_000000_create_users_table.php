@@ -23,6 +23,7 @@ return new class extends Migration
             $table->enum('role', ["acct officer", 'customer']);
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletesTz($column = 'deleted_at', $precision = 0);
         });
     }
 

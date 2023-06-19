@@ -12,10 +12,10 @@ use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\CloseAcctRequest;
 use App\Http\Requests\CreateAllRequest;
 use App\Http\Resources\AccountResource;
 use App\Http\Requests\AcctNumberRequest;
+use App\Http\Requests\CloseAllRequest;
 use App\Http\Requests\CreditDebitRequest;
 use App\Http\Requests\OpenNewAcctRequest;
 
@@ -191,9 +191,10 @@ class AcctOfficersController extends Controller
 
             #Customer Credit Transaction
             $transaction = Transaction::create([
-                'customer_id' => $acct->customer_id,
+                'uuid' => Str::orderedUuid(),
+                'account_id' => $acct->id,
                 'date_time' => Carbon::now(),
-                'description' =>  "Initial cash deposit by " . Auth::user()->name,
+                'description' =>  "Initial cash deposit by " . $request['byName'],
                 'type' => 'credit',
                 'currency' => $acct->currency,
                 'amount' => $amount,
@@ -235,16 +236,17 @@ class AcctOfficersController extends Controller
         }
 
         #Database Transaction
-        return DB::transaction(function () use ($acct, $openingBal, $amount) {
+        return DB::transaction(function () use ($request, $acct, $openingBal, $amount) {
 
             #Customer Debit Process
             $closingBal = $openingBal - $amount;
 
             #Customer Debit Transaction
             $transaction = Transaction::create([
-                'customer_id' => $acct->customer_id,
+                'uuid' => Str::orderedUuid(),
+                'account_id' => $acct->id,
                 'date_time' => Carbon::now(),
-                'description' =>  "Cash withdrawal by " . $acct->customer->user->name,
+                'description' =>  "Cash withdrawal by " . $request['byName'],
                 'type' => 'debit',
                 'currency' => $acct->currency,
                 'amount' => $amount,
@@ -264,16 +266,39 @@ class AcctOfficersController extends Controller
         }, 1);
     }
 
-    public function closeAcct(CloseAcctRequest $request)
+    public function closeAcct(AcctNumberRequest $request)
+    {
+        #Customer Account Number
+        $acct = Account::where('acct_number', $request['acctNumber'])->first();
+
+        #Validate Account Number
+        if (!$acct) {
+            return $this->error('', 'Invalid account number', 404);
+        }
+
+        #Delete Accounts/Transactions
+        $acct->delete();
+
+        return $this->success([
+            'message' => 'Account successfully closed/delete'
+        ]);
+    }
+
+    public function closeAll(CloseAllRequest $request)
     {
         #Customer Email
-        $user = User::where('email', $request['email']);
+        $user = User::where('email', $request['email'])->first();
+
+        #Validate Customer Email
+        if (!$user) {
+            return $this->error('', 'Invalid user email or does not exist...', 404);
+        }
 
         #Delete User/Customer/Accounts/Transactions
         $user->delete();
 
         return $this->success([
-            'message' => 'Account successfully closed/delete'
+            'message' => 'User/Customer/Accounts/Transactions successfully closed/delete'
         ]);
     }
 }

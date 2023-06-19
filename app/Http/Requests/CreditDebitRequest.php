@@ -25,6 +25,7 @@ class CreditDebitRequest extends FormRequest
     {
         return [
             'acctNumber' => ['required', 'string', 'min:10', 'max:10'],
+            'byName' => ['required', 'string'],
             'amount' => ['required', 'numeric', 'decimal:2', 'min:0.01']
 
         ];

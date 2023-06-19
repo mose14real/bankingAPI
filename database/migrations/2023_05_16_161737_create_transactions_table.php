@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('reference');
             $table->enum('status', ['successful', 'pending', 'failed']);
             $table->timestamps();
+            $table->softDeletesTz($column = 'deleted_at', $precision = 0);
         });
     }
 
